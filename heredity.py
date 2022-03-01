@@ -1,6 +1,7 @@
 import csv
 import itertools
 import sys
+from time import process_time_ns
 
 PROBS = {
 
@@ -160,6 +161,19 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         else:
             parents = {mom:0,dad:0}
             for parent in parents:
+                parents[parent] = (
+                    1 - PROBS["mutation"] if parent in two_genes else
+                    0.49 if parent in one_gene else
+                    PROBS["mutation"]
+                )
+            prob *=(
+                parents[mom]*parents[dad] if genes == 2 else
+                parents[mom] *(1 - parents[dad]) + (1 - parents[mom]) * parents[dad] if genes == 1 else
+                (1 - parents[mom]) * (1 - parents[dad])
+            )
+        prob *= PROBS["trait"][genes][trait]
+    print(prob)
+    return prob
                 
 
 
@@ -170,7 +184,15 @@ def update(probabilities, one_gene, two_genes, have_trait, p):
     Which value for each distribution is updated depends on whether
     the person is in `have_gene` and `have_trait`, respectively.
     """
-    raise NotImplementedError
+    for person in probabilities:
+        genes = (
+            2 if person in two_genes else
+            1 if person in one_gene else
+            0
+        )
+        trait = person in have_trait
+        probabilities[person]["gene"][genes]+=p
+        probabilities[person]["trait"][trait]+=p
 
 
 def normalize(probabilities):
