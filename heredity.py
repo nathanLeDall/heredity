@@ -41,11 +41,9 @@ PROBS = {
 def main():
 
     # Check for proper usage
-    """ if len(sys.argv) != 2:
+    if len(sys.argv) != 2:
         sys.exit("Usage: python heredity.py data.csv")
-    people = load_data(sys.argv[1])"""
-    temp = "data/family0.csv"
-    people = load_data(temp)
+    people = load_data(sys.argv[1])
 
     # Keep track of gene and trait probabilities for each person
     probabilities = {
@@ -142,10 +140,6 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         * everyone in set `have_trait` has the trait, and
         * everyone not in set` have_trait` does not have the trait.
     """
-    one_gene = {"Harry"}
-    two_genes = {"James"}
-    have_trait = {"James"}
-    print(people)
     prob = float(1)
     for person in people:
         genes = (
@@ -172,7 +166,6 @@ def joint_probability(people, one_gene, two_genes, have_trait):
                 (1 - parents[mom]) * (1 - parents[dad])
             )
         prob *= PROBS["trait"][genes][trait]
-    print(prob)
     return prob
                 
 
@@ -200,7 +193,19 @@ def normalize(probabilities):
     Update `probabilities` such that each probability distribution
     is normalized (i.e., sums to 1, with relative proportions the same).
     """
-    raise NotImplementedError
+    print(probabilities)
+    for person in probabilities:
+        #trait
+        tmp = 1/(probabilities[person]["trait"][True]+probabilities[person]["trait"][False])
+        probabilities[person]["trait"][True] *= tmp
+        probabilities[person]["trait"][False] *= tmp
+        #genes
+        tmp = 1/(probabilities[person]["gene"][0]+probabilities[person]["gene"][1]+probabilities[person]["gene"][2])
+        probabilities[person]["gene"][0] *= tmp
+        probabilities[person]["gene"][1] *= tmp
+        probabilities[person]["gene"][2] *= tmp
+        
+        
 
 
 if __name__ == "__main__":
